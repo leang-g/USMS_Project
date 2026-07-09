@@ -1,12 +1,8 @@
 """Student role functions."""
 
-
-# modules/student_module.py
-
 from database import students_db, courses_db, find_student_by_id
 
 def student_menu(student_id):
-    """Student Dashboard"""
     student = find_student_by_id(student_id)
     if not student:
         print("❌ Student not found!")
@@ -43,28 +39,39 @@ def student_menu(student_id):
             print("❌ Invalid choice!")
 
 def view_profile(student_id):
-    """View Profile - Hash Table O(1)"""
     student = find_student_by_id(student_id)
     if not student:
+        print("❌ Student not found!")
         return
     
-    print("\n--- My Profile ---")
-    print(f"  📛 ID: {student.sid}")
-    print(f"  👤 Name: {student.name}")
-    print(f"  🎓 Major: {student.major}")
-    print(f"  📊 GPA: {student.gpa}")
-    print(f"  ✅ Completed Courses: {', '.join(student.completed_courses) if student.completed_courses else 'None'}")
-    print(f"  📖 Enrolled Courses: {', '.join(student.enrolled_courses) if student.enrolled_courses else 'None'}")
+    print("\n" + "-"*40)
+    print("📋 MY PROFILE")
+    print("-"*40)
+    print(f"  📛 ID          : {student.sid}")
+    print(f"  👤 Name        : {student.name}")
+    print(f"  🎓 Major       : {student.major}")
+    print(f"  📊 GPA         : {student.gpa}")
+    
+    completed = ', '.join(student.completed_courses) if student.completed_courses else 'None'
+    print(f"  ✅ Completed   : {completed}")
+    
+    enrolled = ', '.join(student.enrolled_courses) if student.enrolled_courses else 'None'
+    print(f"  📖 Enrolled    : {enrolled}")
+    print("-"*40)
 
 def view_materials(student_id):
-    """View Course Materials - Hash Table"""
     student = find_student_by_id(student_id)
     if not student:
+        print("❌ Student not found!")
         return
     
-    print("\n--- My Course Materials ---")
+    print("\n" + "-"*40)
+    print("📄 COURSE MATERIALS")
+    print("-"*40)
+    
     if not student.enrolled_courses:
         print("📭 You are not enrolled in any courses.")
+        print("   Use 'Enroll in Course' to add some!")
         return
     
     for cid in student.enrolled_courses:
@@ -72,18 +79,20 @@ def view_materials(student_id):
         if course:
             print(f"\n📘 {course.name} ({cid})")
             print(f"   Semester: {course.semester}")
-            print(f"   📄 Materials: Lecture Slides, Notes, Assignments")
+            print(f"   📄 Materials: Lecture Slides, Lab Notes, Assignments")
         else:
             print(f"\n⚠️ Course {cid} not found in database.")
+    print("-"*40)
 
 def enroll_course(student_id):
-    """Enroll in Course - Tree (browse) + Graph (prerequisite check)"""
     student = find_student_by_id(student_id)
     if not student:
+        print("❌ Student not found!")
         return
     
-    print("\n--- Enroll in Course ---")
-    print("📚 Available Courses:")
+    print("\n" + "-"*40)
+    print("📚 ENROLL IN COURSE")
+    print("-"*40)
     
     available = []
     for cid, course in courses_db.items():
@@ -126,12 +135,15 @@ def enroll_course(student_id):
     print(f"✅ Successfully enrolled in {course.name}!")
 
 def submit_assignment(student_id):
-    """Submit Assignment - Hash Table"""
     student = find_student_by_id(student_id)
     if not student:
+        print("❌ Student not found!")
         return
     
-    print("\n--- Submit Assignment ---")
+    print("\n" + "-"*40)
+    print("📤 SUBMIT ASSIGNMENT")
+    print("-"*40)
+    
     if not student.enrolled_courses:
         print("📭 You are not enrolled in any courses.")
         return
@@ -156,40 +168,58 @@ def submit_assignment(student_id):
             print("❌ Invalid selection.")
     except ValueError:
         print("❌ Invalid input.")
+    print("-"*40)
 
 def view_roadmap(student_id):
-    """View Roadmap - Graph (shows completed vs locked)"""
     student = find_student_by_id(student_id)
     if not student:
+        print("❌ Student not found!")
         return
     
-    print("\n--- My Academic Roadmap ---")
+    print("\n" + "="*50)
+    print("   🗺️ MY ACADEMIC ROADMAP")
+    print("="*50)
     
-    print("\n✅ Completed Courses:")
-    for cid in student.completed_courses:
-        course = courses_db.get(cid)
-        name = course.name if course else cid
-        print(f"  ✅ {cid}: {name}")
+    # 1. Completed Courses
+    print("\n✅ COMPLETED COURSES:")
+    if student.completed_courses:
+        for cid in student.completed_courses:
+            course = courses_db.get(cid)
+            name = course.name if course else cid
+            print(f"  ✅ {cid}: {name}")
+    else:
+        print("  (No courses completed yet)")
     
-    print("\n📖 Enrolled Courses:")
-    for cid in student.enrolled_courses:
-        course = courses_db.get(cid)
-        name = course.name if course else cid
-        print(f"  📖 {cid}: {name}")
+    # 2. Enrolled Courses
+    print("\n📖 ENROLLED COURSES:")
+    if student.enrolled_courses:
+        for cid in student.enrolled_courses:
+            course = courses_db.get(cid)
+            name = course.name if course else cid
+            print(f"  📖 {cid}: {name} (In Progress)")
+    else:
+        print("  (Not enrolled in any courses)")
     
-    print("\n🔒 Locked Courses (Need prerequisites):")
+    # 3. Locked Courses
+    print("\n🔒 LOCKED COURSES (Need prerequisites):")
+    locked_count = 0
     for cid, course in courses_db.items():
         if cid not in student.completed_courses and cid not in student.enrolled_courses:
             prereq_met = True
+            missing = []
             for prereq in course.prerequisites:
                 if prereq not in student.completed_courses:
                     prereq_met = False
-                    break
+                    missing.append(prereq)
             if not prereq_met:
-                prereq_str = f" (Need: {', '.join(course.prerequisites)})"
-                print(f"  🔒 {cid}: {course.name}{prereq_str}")
-    
-    print("\n📋 Available Courses:")
+                locked_count += 1
+                print(f"  🔒 {cid}: {course.name} (Need: {', '.join(missing)})")
+    if locked_count == 0:
+        print("  (No locked courses found)")
+
+    # 4. Available Courses
+    print("\n📋 AVAILABLE COURSES (Prerequisites met):")
+    available_count = 0
     for cid, course in courses_db.items():
         if cid not in student.completed_courses and cid not in student.enrolled_courses:
             prereq_met = True
@@ -198,4 +228,9 @@ def view_roadmap(student_id):
                     prereq_met = False
                     break
             if prereq_met:
+                available_count += 1
                 print(f"  📋 {cid}: {course.name}")
+    if available_count == 0:
+        print("  (No available courses right now)")
+    
+    print("\n" + "="*50)

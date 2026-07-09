@@ -13,9 +13,8 @@ Welcome to the **University Student Management System (USMS)**! This guide will 
 3. run python main.py
 4. You will see this login screen
    
-==================================================
    🎓 ITE STUDENT MANAGEMENT SYSTEM
-==================================================
+   
 1. Student
 2. Teacher
 3. Admin

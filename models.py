@@ -1,36 +1,35 @@
-"""Core model classes for the University Student Management System."""
-
+# models.py
 
 class Student:
-    def __init__(self, student_id, name, email, major):
-        self.student_id = student_id
+    def __init__(self, sid, name, major, gpa, completed_courses=None):
+        self.sid = sid
         self.name = name
-        self.email = email
         self.major = major
+        self.gpa = gpa
+        self.completed_courses = completed_courses if completed_courses else []
         self.enrolled_courses = []
+        self.attendance = {}  # course_id -> percentage
 
-    def __repr__(self):
-        return f"Student({self.student_id}, {self.name})"
-
+    def __str__(self):
+        return f"{self.sid}: {self.name} | GPA: {self.gpa}"
 
 class Teacher:
-    def __init__(self, teacher_id, name, email, department):
-        self.teacher_id = teacher_id
+    def __init__(self, tid, name, department):
+        self.tid = tid
         self.name = name
-        self.email = email
         self.department = department
         self.assigned_courses = []
 
-    def __repr__(self):
-        return f"Teacher({self.teacher_id}, {self.name})"
-
+    def __str__(self):
+        return f"{self.tid}: {self.name} | Dept: {self.department}"
 
 class Course:
-    def __init__(self, course_id, title, credits):
-        self.course_id = course_id
-        self.title = title
+    def __init__(self, cid, name, credits, semester, prerequisites=None):
+        self.cid = cid
+        self.name = name
         self.credits = credits
-        self.prerequisites = []
+        self.semester = semester
+        self.prerequisites = prerequisites if prerequisites else []
 
-    def __repr__(self):
-        return f"Course({self.course_id}, {self.title})"
+    def __str__(self):
+        return f"{self.cid}: {self.name} ({self.semester})"

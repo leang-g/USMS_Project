@@ -1,6 +1,5 @@
 """Entry point for the University Student Management System."""
 
-
 from database import students_db, teachers_db
 from modules.student_module import student_menu
 from modules.teacher_module import teacher_menu

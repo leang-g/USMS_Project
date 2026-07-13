@@ -128,12 +128,7 @@ def generate_reports():
         for cid in sorted(courses_db.keys()):
             course = courses_db[cid]
             print(f"  {cid}: {course.name} ({course.semester})")
-    
-    # Report 3: Teacher's classes
-    print(f"\n--- My Assigned Courses ---")
-    # This would come from teacher object, simplified here
-    print("  (Teacher class assignment feature coming soon!)")
-
+ 
 def view_all_students():
     """View all students - Hash Table"""
     if not students_db:

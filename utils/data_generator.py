@@ -1,6 +1,6 @@
 """Dummy data generator for development and testing."""
 
-from database import students_db, teachers_db, courses_db
+from database import students_db, teachers_db, courses_db, build_prereq_graph, prereq_graph, build_attendance_graph, attendance_graph  # (from graph)
 from models import Student, Teacher, Course
 
 def seed_database():
@@ -58,5 +58,13 @@ def seed_database():
     ]
     for tid, name, dept in teachers_data:
         teachers_db[tid] = Teacher(tid, name, dept)
+
+    # (from graph): build the course prerequisite DAG and validate it is acyclic.
+    build_prereq_graph()  # (from graph)
+    if prereq_graph.has_cycle():  # (from graph)
+        print("⚠️ Warning: course prerequisites contain a cycle!")
+
+    # (from graph): build the attendance graph (student -> course edges).
+    build_attendance_graph()  # (from graph)
 
     print(f"✅ Database seeded! {len(students_db)} students, {len(teachers_db)} teachers, {len(courses_db)} courses.")

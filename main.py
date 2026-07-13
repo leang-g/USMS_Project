@@ -51,5 +51,5 @@ def login():
 
 if __name__ == "__main__":
     print("🚀 Starting University Student Management System...")
-    seed_database()
+    seed_database()  # (from graph): now also builds prereq_graph + attendance_graph
     login()

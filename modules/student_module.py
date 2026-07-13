@@ -18,9 +18,9 @@ def student_menu(student_id):
         print("3. Enroll in Course")
         print("4. Submit Assignment")
         print("5. View My Roadmap")
-        print("6. Logout")
+        print("6. Logout")  # (changed): removed "Course Dependencies" option
 
-        choice = input("\nChoose (1-6): ")
+        choice = input("\nChoose (1-6): ")  # (changed): updated range
 
         if choice == "1":
             view_profile(student_id)
@@ -31,8 +31,8 @@ def student_menu(student_id):
         elif choice == "4":
             submit_assignment(student_id)
         elif choice == "5":
-            view_roadmap(student_id)
-        elif choice == "6":
+            view_roadmap(student_id)  # (changed): now includes course dependencies
+        elif choice == "6":  # (changed): was "7"
             print("Logging out...")
             break
         else:
@@ -232,5 +232,38 @@ def view_roadmap(student_id):
                 print(f"  📋 {cid}: {course.name}")
     if available_count == 0:
         print("  (No available courses right now)")
+
+    # 5. Course Dependencies
+    from database import prereq_graph  # (from graph)
+    print("\n🕸️ COURSE DEPENDENCIES:")
+    if not student.enrolled_courses:
+        print("  📭 You are not enrolled in any courses.")
+    else:
+        completed = set(student.completed_courses)
+        for cid in student.enrolled_courses:
+            course = courses_db.get(cid)
+            print(f"\n  📘 {cid}: {course.name if course else cid}")
+            all_prereqs = set()
+            stack = [cid]
+            while stack:
+                current = stack.pop()
+                for vertex in prereq_graph.get_vertices():  # (from graph)
+                    if prereq_graph.has_edge(vertex, current) and vertex != cid:  # (from graph)
+                        if vertex not in all_prereqs:
+                            all_prereqs.add(vertex)
+                            stack.append(vertex)
+            if not all_prereqs:
+                print("     ✅ No prerequisites required.")
+                continue
+            unmet = sorted(p for p in all_prereqs if p not in completed)
+            met = sorted(p for p in all_prereqs if p in completed)
+            if met:
+                print(f"     ✅ Completed prereqs: {', '.join(met)}")
+            if unmet:
+                print(f"     🔒 Still needed: {', '.join(unmet)}")
+            else:
+                print("     🎉 All prerequisites satisfied!")
     
     print("\n" + "="*50)
+
+# (from graph): use the prerequisite graph to show blocked prerequisites per course.

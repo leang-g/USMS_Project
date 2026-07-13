@@ -19,9 +19,10 @@ def teacher_menu(teacher_id):
         print("3. View Class Structure")
         print("4. Generate Reports")
         print("5. View All Students")
-        print("6. Logout")
+        print("6. View Course Prerequisite Graph")  # (from graph)
+        print("7. Logout")
 
-        choice = input("\nChoose (1-6): ")
+        choice = input("\nChoose (1-7): ")
 
         if choice == "1":
             grade_assignment()
@@ -34,6 +35,8 @@ def teacher_menu(teacher_id):
         elif choice == "5":
             view_all_students()
         elif choice == "6":
+            view_prerequisite_graph()  # (from graph)
+        elif choice == "7":
             print("Logging out...")
             break
         else:
@@ -83,8 +86,7 @@ def view_student_attendance():
     for cid, percentage in student.attendance.items():
         course = courses_db.get(cid)
         name = course.name if course else cid
-        bar = "█" * (percentage // 5) + "░" * (20 - (percentage // 5))
-        print(f"  {cid}: {name} - {percentage}% {bar}")
+        print(f"  {cid}: {name} - {percentage}%")  # (changed): removed bar chart
 
 def view_class_structure():
     """View Class Structure - Tree (organized by semester)"""
@@ -140,3 +142,28 @@ def view_all_students():
     for sid in sorted(students_db.keys()):
         student = students_db[sid]
         print(f"  {sid}: {student.name} | GPA: {student.gpa}")
+
+# (from graph): visualize the course prerequisite DAG using the Graph structure.
+def view_prerequisite_graph():  # (from graph)
+    """Course Prerequisite Graph - topological order + cycle detection."""
+    from database import prereq_graph, courses_db  # (from graph)
+
+    print("\n🕸️ COURSE PREREQUISITE GRAPH")
+
+    if prereq_graph.has_cycle():  # (from graph)
+        print("⚠️ Invalid curriculum: prerequisites contain a CYCLE!")
+        print("   Some courses can never be unlocked. Fix the prerequisites.")
+        return
+
+    order = prereq_graph.topological_sort()  # (from graph)
+    if not order:
+        print("📭 No courses in the graph.")
+        return
+
+    print("\n📚 Suggested course order (topological sort):")
+    for step, cid in enumerate(order, 1):
+        course = courses_db.get(cid)
+        name = course.name if course else cid
+        prereqs = course.prerequisites if course else []
+        prereq_str = f"  (needs: {', '.join(prereqs)})" if prereqs else "  (no prerequisites)"
+        print(f"  {step}. {cid}: {name}{prereq_str}")

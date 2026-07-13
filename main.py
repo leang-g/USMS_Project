@@ -38,9 +38,15 @@ def login():
                 print("Available teachers:")
                 for tid in sorted(teachers_db.keys()):
                     print(f"  {tid}: {teachers_db[tid].name}")
-
         elif choice == "3":
-            admin_menu()
+                print("\n🔒 ADMIN AUTHENTICATION REQUIRED")
+                username = input("Enter Admin Username: ").strip()
+                password = input("Enter Admin Password: ").strip()
+                if username == "admin" and password == "admin123":
+                    print("✅ Access Granted!")
+                    admin_menu()
+                else:
+                    print("❌ Access Denied! Invalid credentials.")
 
         elif choice == "4":
             print("Goodbye! 👋")

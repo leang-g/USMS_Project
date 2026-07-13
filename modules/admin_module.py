@@ -1,11 +1,9 @@
 """Admin role functions."""
+# modules/admin_module.py - TOP OF FILE
 
-from database import (
-    students_db, teachers_db, courses_db,
-    undo_stack, get_next_student_id, get_next_teacher_id,
-    find_student_by_id, find_course_by_id, find_teacher_by_id
-)
+from database import students_db, teachers_db, courses_db, undo_stack, get_next_student_id, find_student_by_id
 from models import Student, Teacher, Course
+from utils.input_validator import get_float
 
 def admin_menu():
     """Admin Dashboard"""
@@ -18,9 +16,10 @@ def admin_menu():
         print("3. Manage Courses")
         print("4. Undo Last Action")
         print("5. View All Data")
-        print("6. Logout")
+        print("6. View Statistics")  # <-- NEW OPTION
+        print("7. Logout")
 
-        choice = input("\nChoose (1-6): ")
+        choice = input("\nChoose (1-7): ")  # <-- Changed to 1-7
 
         if choice == "1":
             manage_students()
@@ -32,11 +31,63 @@ def admin_menu():
             undo_last_action()
         elif choice == "5":
             view_all_data()
-        elif choice == "6":
+        elif choice == "6":   # <-- ADD THIS!
+            view_statistics()
+        elif choice == "7":   # <-- Changed to 7
             print("Logging out...")
             break
         else:
-            print("❌ Invalid choice!")
+            print("❌ Invalid choice. Please enter 1-7.")
+
+# ---------- ADD THIS NEW FUNCTION ----------
+def view_statistics():
+    """View system statistics"""
+    print("\n" + "="*50)
+    print("   📊 SYSTEM STATISTICS")
+    print("="*50)
+    
+    # Total counts
+    total_students = len(students_db)
+    total_teachers = len(teachers_db)
+    total_courses = len(courses_db)
+    
+    print(f"\n👨‍🎓 Total Students: {total_students}")
+    print(f"👨‍🏫 Total Teachers: {total_teachers}")
+    print(f"📚 Total Courses: {total_courses}")
+    
+    # Average GPA
+    if total_students > 0:
+        avg_gpa = sum(s.gpa for s in students_db.values()) / total_students
+        print(f"📈 Average GPA: {avg_gpa:.2f}")
+        
+        # Highest GPA
+        top_student = max(students_db.values(), key=lambda s: s.gpa)
+        print(f"🏆 Highest GPA: {top_student.name} ({top_student.gpa})")
+        
+        # Lowest GPA
+        bottom_student = min(students_db.values(), key=lambda s: s.gpa)
+        print(f"📉 Lowest GPA: {bottom_student.name} ({bottom_student.gpa})")
+    
+    # Most popular courses
+    course_counts = {}
+    for s in students_db.values():
+        for cid in s.enrolled_courses + s.completed_courses:
+            course_counts[cid] = course_counts.get(cid, 0) + 1
+    
+    if course_counts:
+        print("\n🔥 Most Popular Courses:")
+        popular = sorted(course_counts.items(), key=lambda x: x[1], reverse=True)[:5]
+        for cid, count in popular:
+            course = courses_db.get(cid)
+            name = course.name if course else cid
+            print(f"  - {name}: {count} students")
+    else:
+        print("\n🔥 No students enrolled in any courses yet.")
+
+    # Undo stack status
+    print(f"\n↩️ Undo Stack Size: {undo_stack.size() if hasattr(undo_stack, 'size') else len(undo_stack)} actions available")
+    
+    print("\n" + "="*50)
 
 # ---------- STUDENT MANAGEMENT ----------
 def manage_students():
@@ -355,6 +406,34 @@ def view_all_data():
     for cid in sorted(courses_db.keys()):
         course = courses_db[cid]
         print(f"  {cid}: {course.name} ({course.semester})")
+        
+# ---------- Display All Data ---------- #
+
+def view_statistics():
+    print("\n📊 SYSTEM STATISTICS")
+    print("-"*30)
+    print(f"👨‍🎓 Total Students: {len(students_db)}")
+    print(f"👨‍🏫 Total Teachers: {len(teachers_db)}")
+    print(f"📚 Total Courses: {len(courses_db)}")
+    
+    # Average GPA
+    if students_db:
+        avg_gpa = sum(s.gpa for s in students_db.values()) / len(students_db)
+        print(f"📈 Average GPA: {avg_gpa:.2f}")
+    
+    # Most popular courses
+    course_counts = {}
+    for s in students_db.values():
+        for cid in s.enrolled_courses + s.completed_courses:
+            course_counts[cid] = course_counts.get(cid, 0) + 1
+    
+    if course_counts:
+        popular = sorted(course_counts.items(), key=lambda x: x[1], reverse=True)[:3]
+        print("🔥 Most Popular Courses:")
+        for cid, count in popular:
+            course = courses_db.get(cid)
+            name = course.name if course else cid
+            print(f"  - {name}: {count} students")
 
 # Import for input validation
 from utils.input_validator import get_float

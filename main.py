@@ -17,10 +17,10 @@ def login():
         print("3. Admin")
         print("4. Exit")
 
-        choice = input("\nChoose your role (1-4): ")
+        choice = input("\nChoose your role (1-4): ").strip()  # <-- ADDED .strip() HERE
 
         if choice == "1":
-            student_id = input("Enter your Student ID (e.g., ITE-001): ")
+            student_id = input("Enter your Student ID (e.g., ITE-001): ").strip()
             if student_id in students_db:
                 student_menu(student_id)
             else:
@@ -30,7 +30,7 @@ def login():
                     print(f"  {sid}: {students_db[sid].name}")
 
         elif choice == "2":
-            teacher_id = input("Enter your Teacher ID (e.g., T001): ")
+            teacher_id = input("Enter your Teacher ID (e.g., T001): ").strip()
             if teacher_id in teachers_db:
                 teacher_menu(teacher_id)
             else:

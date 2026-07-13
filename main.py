@@ -17,10 +17,10 @@ def login():
         print("3. Admin")
         print("4. Exit")
 
-        choice = input("\nChoose your role (1-4): ")
+        choice = input("\nChoose your role (1-4): ").strip()
 
         if choice == "1":
-            student_id = input("Enter your Student ID (e.g., ITE-001): ")
+            student_id = input("Enter your Student ID (e.g., ITE-001): ").strip()
             if student_id in students_db:
                 student_menu(student_id)
             else:
@@ -30,7 +30,7 @@ def login():
                     print(f"  {sid}: {students_db[sid].name}")
 
         elif choice == "2":
-            teacher_id = input("Enter your Teacher ID (e.g., T001): ")
+            teacher_id = input("Enter your Teacher ID (e.g., T001): ").strip()
             if teacher_id in teachers_db:
                 teacher_menu(teacher_id)
             else:
@@ -38,9 +38,15 @@ def login():
                 print("Available teachers:")
                 for tid in sorted(teachers_db.keys()):
                     print(f"  {tid}: {teachers_db[tid].name}")
-
         elif choice == "3":
-            admin_menu()
+                print("\n🔒 ADMIN AUTHENTICATION REQUIRED")
+                username = input("Enter Admin Username: ").strip()
+                password = input("Enter Admin Password: ").strip()
+                if username == "admin" and password == "admin123":
+                    print("✅ Access Granted!")
+                    admin_menu()
+                else:
+                    print("❌ Access Denied! Invalid credentials.")
 
         elif choice == "4":
             print("Goodbye! 👋")

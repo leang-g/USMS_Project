@@ -1,9 +1,10 @@
 """Student role functions."""
 
-from database import students_db, courses_db, find_student_by_id
+from database import students_db, courses_db
 
 def student_menu(student_id):
-    student = find_student_by_id(student_id)
+    """Student Dashboard"""
+    student = students_db.get(student_id)
     if not student:
         print("❌ Student not found!")
         return
@@ -21,6 +22,7 @@ def student_menu(student_id):
         print("6. Logout")  # (changed): removed "Course Dependencies" option
 
         choice = input("\nChoose (1-6): ")  # (changed): updated range
+        choice = input("\nChoose (1-6): ").strip()  # <-- Added .strip() to remove spaces
 
         if choice == "1":
             view_profile(student_id)
@@ -36,10 +38,11 @@ def student_menu(student_id):
             print("Logging out...")
             break
         else:
-            print("❌ Invalid choice!")
+            print("❌ Invalid choice! Please enter 1-6.")
 
+# ---------- VIEW PROFILE ----------
 def view_profile(student_id):
-    student = find_student_by_id(student_id)
+    student = students_db.get(student_id)
     if not student:
         print("❌ Student not found!")
         return
@@ -59,8 +62,9 @@ def view_profile(student_id):
     print(f"  📖 Enrolled    : {enrolled}")
     print("-"*40)
 
+# ---------- VIEW COURSE MATERIALS ----------
 def view_materials(student_id):
-    student = find_student_by_id(student_id)
+    student = students_db.get(student_id)
     if not student:
         print("❌ Student not found!")
         return
@@ -84,8 +88,9 @@ def view_materials(student_id):
             print(f"\n⚠️ Course {cid} not found in database.")
     print("-"*40)
 
+# ---------- ENROLL IN COURSE ----------
 def enroll_course(student_id):
-    student = find_student_by_id(student_id)
+    student = students_db.get(student_id)
     if not student:
         print("❌ Student not found!")
         return
@@ -112,7 +117,7 @@ def enroll_course(student_id):
         print("📭 No courses available for enrollment.")
         return
     
-    choice = input("\nEnter Course ID to enroll (or 0 to cancel): ").upper()
+    choice = input("\nEnter Course ID to enroll (or 0 to cancel): ").upper().strip()
     if choice == "0":
         return
     
@@ -134,8 +139,11 @@ def enroll_course(student_id):
     student.enrolled_courses.append(cid)
     print(f"✅ Successfully enrolled in {course.name}!")
 
+# ---------- SUBMIT ASSIGNMENT ----------
+
 def submit_assignment(student_id):
-    student = find_student_by_id(student_id)
+    """Submit Assignment - Hash Table"""
+    student = students_db.get(student_id)
     if not student:
         print("❌ Student not found!")
         return
@@ -152,26 +160,40 @@ def submit_assignment(student_id):
     for i, cid in enumerate(student.enrolled_courses, 1):
         course = courses_db.get(cid)
         name = course.name if course else cid
-        print(f"  {i}. {name}")
+        print(f"  {i}. {name} (ID: {cid})")  # <-- SHOW THE ID TOO!
     
-    choice = input("Enter course number to submit assignment (or 0 to cancel): ")
+    choice = input("Enter course number (e.g., 1) or Course ID (e.g., CS201) to submit (or 0 to cancel): ").strip()
     if choice == "0":
         return
     
-    try:
+    # Try to find the course
+    selected_cid = None
+    
+    # Check if it's a number (list index)
+    if choice.isdigit():
         idx = int(choice) - 1
         if 0 <= idx < len(student.enrolled_courses):
-            cid = student.enrolled_courses[idx]
-            course = courses_db.get(cid)
-            print(f"✅ Assignment submitted for {course.name if course else cid}!")
-        else:
-            print("❌ Invalid selection.")
-    except ValueError:
-        print("❌ Invalid input.")
+            selected_cid = student.enrolled_courses[idx]
+    
+    # If not a number, check if it's a Course ID
+    if selected_cid is None:
+        # Check if the input matches any enrolled course ID
+        for cid in student.enrolled_courses:
+            if cid.upper() == choice.upper():
+                selected_cid = cid
+                break
+    
+    if selected_cid is None:
+        print("❌ Invalid selection. Please enter a number from the list or a valid Course ID.")
+        return
+    
+    course = courses_db.get(selected_cid)
+    print(f"✅ Assignment submitted for {course.name if course else selected_cid}!")
     print("-"*40)
-
+    
+# ---------- VIEW ROADMAP ----------
 def view_roadmap(student_id):
-    student = find_student_by_id(student_id)
+    student = students_db.get(student_id)
     if not student:
         print("❌ Student not found!")
         return

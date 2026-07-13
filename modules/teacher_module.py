@@ -86,10 +86,7 @@ def view_student_attendance():
     for cid, percentage in student.attendance.items():
         course = courses_db.get(cid)
         name = course.name if course else cid
-        print(f"  {cid}: {name} - {percentage}%")  # (changed): removed bar chart
-        
-        # ✅ FIXED: Convert percentage to int before multiplication
-        pct = int(percentage)  # Convert to integer
+        pct = int(percentage)
         bar = "█" * (pct // 5) + "░" * (20 - (pct // 5))
         print(f"  {cid}: {name} - {pct}% {bar}")
 

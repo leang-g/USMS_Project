@@ -16,7 +16,7 @@ def admin_menu():
         print("3. Manage Courses")
         print("4. Undo Last Action")
         print("5. View All Data")
-        print("6. View Statistics")  # <-- NEW OPTION
+        print("6. View Statistics")  
         print("7. Logout")
 
         choice = input("\nChoose (1-7): ")  # <-- Changed to 1-7

@@ -1,6 +1,7 @@
 """Student role functions."""
 
 from database import students_db, courses_db
+from database import prereq_graph
 
 def student_menu(student_id):
     """Student Dashboard"""
@@ -19,10 +20,9 @@ def student_menu(student_id):
         print("3. Enroll in Course")
         print("4. Submit Assignment")
         print("5. View My Roadmap")
-        print("6. Logout")  # (changed): removed "Course Dependencies" option
+        print("6. Logout")
 
-        choice = input("\nChoose (1-6): ")  # (changed): updated range
-        choice = input("\nChoose (1-6): ").strip()  # <-- Added .strip() to remove spaces
+        choice = input("\nChoose (1-6): ").strip()
 
         if choice == "1":
             view_profile(student_id)
@@ -33,14 +33,14 @@ def student_menu(student_id):
         elif choice == "4":
             submit_assignment(student_id)
         elif choice == "5":
-            view_roadmap(student_id)  # (changed): now includes course dependencies
-        elif choice == "6":  # (changed): was "7"
+            view_roadmap(student_id)
+        elif choice == "6":
             print("Logging out...")
             break
         else:
             print("❌ Invalid choice! Please enter 1-6.")
 
-# ---------- VIEW PROFILE ----------
+
 def view_profile(student_id):
     student = students_db.get(student_id)
     if not student:
@@ -62,7 +62,7 @@ def view_profile(student_id):
     print(f"  📖 Enrolled    : {enrolled}")
     print("-"*40)
 
-# ---------- VIEW COURSE MATERIALS ----------
+
 def view_materials(student_id):
     student = students_db.get(student_id)
     if not student:
@@ -88,7 +88,7 @@ def view_materials(student_id):
             print(f"\n⚠️ Course {cid} not found in database.")
     print("-"*40)
 
-# ---------- ENROLL IN COURSE ----------
+
 def enroll_course(student_id):
     student = students_db.get(student_id)
     if not student:
@@ -139,10 +139,8 @@ def enroll_course(student_id):
     student.enrolled_courses.append(cid)
     print(f"✅ Successfully enrolled in {course.name}!")
 
-# ---------- SUBMIT ASSIGNMENT ----------
 
 def submit_assignment(student_id):
-    """Submit Assignment - Hash Table"""
     student = students_db.get(student_id)
     if not student:
         print("❌ Student not found!")
@@ -160,24 +158,20 @@ def submit_assignment(student_id):
     for i, cid in enumerate(student.enrolled_courses, 1):
         course = courses_db.get(cid)
         name = course.name if course else cid
-        print(f"  {i}. {name} (ID: {cid})")  # <-- SHOW THE ID TOO!
+        print(f"  {i}. {name} (ID: {cid})")
     
     choice = input("Enter course number (e.g., 1) or Course ID (e.g., CS201) to submit (or 0 to cancel): ").strip()
     if choice == "0":
         return
     
-    # Try to find the course
     selected_cid = None
     
-    # Check if it's a number (list index)
     if choice.isdigit():
         idx = int(choice) - 1
         if 0 <= idx < len(student.enrolled_courses):
             selected_cid = student.enrolled_courses[idx]
     
-    # If not a number, check if it's a Course ID
     if selected_cid is None:
-        # Check if the input matches any enrolled course ID
         for cid in student.enrolled_courses:
             if cid.upper() == choice.upper():
                 selected_cid = cid
@@ -190,8 +184,8 @@ def submit_assignment(student_id):
     course = courses_db.get(selected_cid)
     print(f"✅ Assignment submitted for {course.name if course else selected_cid}!")
     print("-"*40)
-    
-# ---------- VIEW ROADMAP ----------
+
+
 def view_roadmap(student_id):
     student = students_db.get(student_id)
     if not student:
@@ -202,7 +196,6 @@ def view_roadmap(student_id):
     print("   🗺️ MY ACADEMIC ROADMAP")
     print("="*50)
     
-    # 1. Completed Courses
     print("\n✅ COMPLETED COURSES:")
     if student.completed_courses:
         for cid in student.completed_courses:
@@ -212,7 +205,6 @@ def view_roadmap(student_id):
     else:
         print("  (No courses completed yet)")
     
-    # 2. Enrolled Courses
     print("\n📖 ENROLLED COURSES:")
     if student.enrolled_courses:
         for cid in student.enrolled_courses:
@@ -222,7 +214,6 @@ def view_roadmap(student_id):
     else:
         print("  (Not enrolled in any courses)")
     
-    # 3. Locked Courses
     print("\n🔒 LOCKED COURSES (Need prerequisites):")
     locked_count = 0
     for cid, course in courses_db.items():
@@ -239,7 +230,6 @@ def view_roadmap(student_id):
     if locked_count == 0:
         print("  (No locked courses found)")
 
-    # 4. Available Courses
     print("\n📋 AVAILABLE COURSES (Prerequisites met):")
     available_count = 0
     for cid, course in courses_db.items():
@@ -254,9 +244,9 @@ def view_roadmap(student_id):
                 print(f"  📋 {cid}: {course.name}")
     if available_count == 0:
         print("  (No available courses right now)")
-
-    # 5. Course Dependencies
-    from database import prereq_graph  # (from graph)
+    
+    print("\n" + "="*50)
+    
     print("\n🕸️ COURSE DEPENDENCIES:")
     if not student.enrolled_courses:
         print("  📭 You are not enrolled in any courses.")
@@ -287,5 +277,3 @@ def view_roadmap(student_id):
                 print("     🎉 All prerequisites satisfied!")
     
     print("\n" + "="*50)
-
-# (from graph): use the prerequisite graph to show blocked prerequisites per course.

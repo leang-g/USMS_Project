@@ -1,10 +1,11 @@
 """Entry point for the University Student Management System."""
 
-from database import students_db, teachers_db
+from database import students_db, teachers_db, build_prereq_graph, build_attendance_graph
 from modules.student_module import student_menu
 from modules.teacher_module import teacher_menu
 from modules.admin_module import admin_menu
 from utils.data_generator import seed_database
+
 
 def login():
     """Main login and role router"""
@@ -38,15 +39,16 @@ def login():
                 print("Available teachers:")
                 for tid in sorted(teachers_db.keys()):
                     print(f"  {tid}: {teachers_db[tid].name}")
+
         elif choice == "3":
-                print("\n🔒 ADMIN AUTHENTICATION REQUIRED")
-                username = input("Enter Admin Username: ").strip()
-                password = input("Enter Admin Password: ").strip()
-                if username == "admin" and password == "admin123":
-                    print("✅ Access Granted!")
-                    admin_menu()
-                else:
-                    print("❌ Access Denied! Invalid credentials.")
+            print("\n🔒 ADMIN AUTHENTICATION REQUIRED")
+            username = input("Enter Admin Username: ").strip()
+            password = input("Enter Admin Password: ").strip()
+            if username == "admin" and password == "admin123":
+                print("✅ Access Granted!")
+                admin_menu()
+            else:
+                print("❌ Access Denied! Invalid credentials.")
 
         elif choice == "4":
             print("Goodbye! 👋")
@@ -55,7 +57,25 @@ def login():
         else:
             print("❌ Invalid choice. Please enter 1-4.")
 
+
 if __name__ == "__main__":
     print("🚀 Starting University Student Management System...")
+    
+    # Seed fresh data every time (no persistence)
     seed_database()
+    
+    # Build the prerequisite graph from the course data
+    build_prereq_graph()
+    
+    # Build the attendance graph from the student data
+    build_attendance_graph()
+    
+    # Optional: Check for cycles and warn
+    from database import prereq_graph
+    if prereq_graph.has_cycle():
+        print("⚠️ WARNING: Course prerequisites contain a cycle!")
+    else:
+        print("✅ No cycles detected in prerequisite graph.")
+    
+    # Start the system
     login()

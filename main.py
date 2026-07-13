@@ -17,7 +17,7 @@ def login():
         print("3. Admin")
         print("4. Exit")
 
-        choice = input("\nChoose your role (1-4): ").strip()  # <-- ADDED .strip() HERE
+        choice = input("\nChoose your role (1-4): ").strip()
 
         if choice == "1":
             student_id = input("Enter your Student ID (e.g., ITE-001): ").strip()

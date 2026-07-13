@@ -66,25 +66,28 @@ def grade_assignment():
 
 def view_student_attendance():
     """View Attendance - Graph (traverse student's course connections)"""
-    sid = input("Enter Student ID to view attendance: ")
-    student = find_student_by_id(sid)
+    sid = input("Enter Student ID to view attendance: ").strip()
+    student = students_db.get(sid)
     
     if not student:
         print("❌ Student not found!")
         return
     
     print(f"\n📊 Attendance for {student.name}")
+    
     if not student.attendance:
         print("📭 No attendance records found.")
         return
     
-    # Graph: shows attendance across all courses
     print("\nCourse Attendance:")
     for cid, percentage in student.attendance.items():
         course = courses_db.get(cid)
         name = course.name if course else cid
-        bar = "█" * (percentage // 5) + "░" * (20 - (percentage // 5))
-        print(f"  {cid}: {name} - {percentage}% {bar}")
+        
+        # ✅ FIXED: Convert percentage to int before multiplication
+        pct = int(percentage)  # Convert to integer
+        bar = "█" * (pct // 5) + "░" * (20 - (pct // 5))
+        print(f"  {cid}: {name} - {pct}% {bar}")
 
 def view_class_structure():
     """View Class Structure - Tree (organized by semester)"""

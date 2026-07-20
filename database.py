@@ -4,12 +4,14 @@ from models import Student, Teacher, Course
 from data_structures.graph import Graph  # (from graph): build the course prereq graph
 from data_structures.tree import Tree, TreeNode  # (from tree): build the curriculum tree
 from data_structures.stack import Stack # (from stack)
+from data_structures.hash_table import HashTable # (from hash_table)
+
 
 
 # ---------- GLOBAL DATABASES (Act as Hash Tables) ----------
-students_db = {}      # Key: "ITE-001", Value: Student object
-teachers_db = {}      # Key: "T001", Value: Teacher object
-courses_db = {}       # Key: "CS101", Value: Course object
+students_db = HashTable()      # Key: "ITE-001", Value: Student object
+teachers_db = HashTable()    # Key: "T001", Value: Teacher object
+courses_db = HashTable()      # Key: "CS101", Value: Course object
 
 # ---------- COURSE PREREQUISITE GRAPH (Directed DAG) ----------
 # (from graph): edge prereq -> course means the prerequisite must be completed first.
@@ -33,7 +35,6 @@ def get_next_student_id():
         return "ITE-001"
     numbers = [int(sid.split("-")[1]) for sid in students_db.keys()]
     return f"ITE-{max(numbers) + 1:03d}"
-
 def get_next_teacher_id():
     if not teachers_db:
         return "T001"

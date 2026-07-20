@@ -3,19 +3,8 @@
 from models import Student, Teacher, Course
 from data_structures.graph import Graph  # (from graph): build the course prereq graph
 from data_structures.tree import Tree, TreeNode  # (from tree): build the curriculum tree
+from data_structures.stack import Stack # (from stack)
 
-
-
-# ---------- SIMPLE STACK ----------
-class SimpleStack:
-    def __init__(self):
-        self.items = []
-    def push(self, item):
-        self.items.append(item)
-    def pop(self):
-        return self.items.pop() if self.items else None
-    def is_empty(self):
-        return len(self.items) == 0
 
 # ---------- GLOBAL DATABASES (Act as Hash Tables) ----------
 students_db = {}      # Key: "ITE-001", Value: Student object
@@ -36,7 +25,7 @@ attendance_graph = Graph()  # (from graph)
 curriculum_tree = Tree()
 
 # ---------- UNDO STACK ----------
-undo_stack = SimpleStack()
+undo_stack = Stack()
 
 # ---------- HELPER FUNCTIONS ----------
 def get_next_student_id():

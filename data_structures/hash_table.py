@@ -2,23 +2,6 @@
 
 
 class HashTable:
-    """
-    A custom hash table implementation with chaining.
-
-    Supports all dict-like operations:
-        - ht[key] = value   (insert/update)
-        - value = ht[key]   (lookup)
-        - del ht[key]       (delete)
-        - key in ht         (contains check)
-        - ht.get(key)       (safe lookup)
-        - ht.keys()         (get all keys)
-        - ht.values()       (get all values)
-        - ht.items()        (get all key-value pairs)
-
-    Time Complexity:
-        - Average: O(1) for insert, search, delete
-        - Worst: O(n) when many collisions occur
-    """
 
     def __init__(self, initial_capacity=16, load_factor=0.75):
         """

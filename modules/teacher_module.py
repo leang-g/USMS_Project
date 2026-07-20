@@ -1,6 +1,7 @@
 """Teacher role functions."""
 
-from database import students_db, courses_db, find_student_by_id, find_teacher_by_id
+from database import students_db, courses_db, find_student_by_id, find_teacher_by_id, teachers_db
+from data_structures.tree import Tree
 
 def teacher_menu(teacher_id):
     """Teacher Dashboard"""
@@ -114,26 +115,53 @@ def view_class_structure():
 def generate_reports():
     """Generate Reports - Tree (in-order traversal for sorted data)"""
     print("\n📊 REPORTS")
+    print("="*40)
     
-    # Report 1: All Students sorted by GPA (Tree would sort)
+    # ---------- Report 1: Students Sorted by GPA ----------
     if students_db:
         print("\n--- Students Sorted by GPA (Highest to Lowest) ---")
-        sorted_students = sorted(students_db.values(), key=lambda s: s.gpa, reverse=True)
+        print("-"*40)
+        
+        from data_structures.tree import Tree
+        student_tree = Tree("Students")
+        
+        for student in students_db.values():
+            student_tree.insert([f"GPA: {student.gpa:.1f}", student.sid], student)
+        
+        sorted_students = student_tree.inorder_traversal()
+        
         for student in sorted_students:
             print(f"  {student.sid}: {student.name} - GPA: {student.gpa}")
+    else:
+        print("\n📭 No students in system.")
     
-    # Report 2: All courses
+    # ---------- Report 2: Courses Organized by Semester ----------
     if courses_db:
-        print("\n--- All Courses ---")
-        for cid in sorted(courses_db.keys()):
-            course = courses_db[cid]
-            print(f"  {cid}: {course.name} ({course.semester})")
+        print("\n--- All Courses (Organized by Semester) ---")
+        print("-"*40)
+        
+        # ✅ USE THE GLOBAL TREE FROM DATABASE
+        from database import curriculum_tree
+        
+        # Check if the tree has data, if not, rebuild it
+        if not curriculum_tree.root.children:
+            from database import build_curriculum_tree
+            build_curriculum_tree()
+        
+        curriculum_tree.browse()
+    else:
+        print("\n📭 No courses in system.")
     
-    # Report 3: Teacher's classes
-    print(f"\n--- My Assigned Courses ---")
-    # This would come from teacher object, simplified here
-    print("  (Teacher class assignment feature coming soon!)")
-
+    # ---------- Report 3: Statistics ----------
+    print("\n--- System Statistics ---")
+    print("-"*40)
+    print(f"  Total Students: {len(students_db)}")
+    print(f"  Total Teachers: {len(teachers_db)}")
+    print(f"  Total Courses: {len(courses_db)}")
+    
+    if students_db:
+        avg_gpa = sum(s.gpa for s in students_db.values()) / len(students_db)
+        print(f"  Average GPA: {avg_gpa:.2f}")
 def view_all_students():
     """View all students - Hash Table"""
     if not students_db:

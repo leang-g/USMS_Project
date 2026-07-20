@@ -2,6 +2,9 @@
 
 from models import Student, Teacher, Course
 from data_structures.graph import Graph  # (from graph): build the course prereq graph
+from data_structures.tree import Tree, TreeNode  # (from tree): build the curriculum tree
+
+
 
 # ---------- SIMPLE STACK ----------
 class SimpleStack:
@@ -28,6 +31,9 @@ prereq_graph = Graph()  # (from graph)
 # record for that course. Separate from prereq_graph so sorting/cycle checks
 # on prerequisites are never affected by attendance data.
 attendance_graph = Graph()  # (from graph)
+
+# Global curriculum tree
+curriculum_tree = Tree()
 
 # ---------- UNDO STACK ----------
 undo_stack = SimpleStack()
@@ -82,3 +88,17 @@ def build_attendance_graph():  # (from graph): build attendance graph from stude
         for cid in student.attendance:
             attendance_graph.add_edge(student.sid, cid)  # (from graph)
     return attendance_graph
+
+def build_curriculum_tree():
+    """Build the curriculum tree from courses_db."""
+    # Reset the tree
+    curriculum_tree.root = TreeNode("Curriculum")
+    
+    if not courses_db:
+        return curriculum_tree
+    
+    for cid, course in courses_db.items():
+        semester = course.semester if hasattr(course, "semester") else "Unknown"
+        curriculum_tree.insert([semester, cid], course)
+    
+    return curriculum_tree

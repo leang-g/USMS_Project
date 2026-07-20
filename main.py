@@ -5,6 +5,7 @@ from modules.student_module import student_menu
 from modules.teacher_module import teacher_menu
 from modules.admin_module import admin_menu
 from utils.data_generator import seed_database
+from database import build_curriculum_tree
 
 
 def login():
@@ -69,6 +70,9 @@ if __name__ == "__main__":
     
     # Build the attendance graph from the student data
     build_attendance_graph()
+    
+    #Build the currimlum tree from courses_db
+    build_curriculum_tree()
     
     # Optional: Check for cycles and warn
     from database import prereq_graph

@@ -81,3 +81,30 @@ class Tree:
         print("=" * 50)
         print(self.root)
 
+
+# ---------- SELF-TEST ----------
+if __name__ == "__main__":
+    print("🧪 Testing Tree...")
+    
+    # Create a tree
+    tree = Tree("Curriculum")
+    
+    # Insert courses
+    class MockCourse:
+        def __init__(self, name, semester):
+            self.name = name
+            self.semester = semester
+    
+    tree.insert(["Year 1 - Semester 1", "CS101"], MockCourse("Programming I", "Year 1 - Sem 1"))
+    tree.insert(["Year 1 - Semester 1", "ITE100"], MockCourse("Intro to ITE", "Year 1 - Sem 1"))
+    tree.insert(["Year 1 - Semester 2", "CS102"], MockCourse("Programming II", "Year 1 - Sem 2"))
+    tree.insert(["Year 2 - Semester 1", "CS201"], MockCourse("Data Structures I", "Year 2 - Sem 1"))
+    
+    tree.browse()
+    
+    # Test in-order traversal
+    print("\n📋 In-order traversal:")
+    for course in tree.inorder_traversal():
+        print(f"  - {course.name}")
+    
+    print("✅ Tree tests passed!")

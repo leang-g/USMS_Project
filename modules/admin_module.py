@@ -1,5 +1,4 @@
 """Admin role functions."""
-# modules/admin_module.py - TOP OF FILE
 
 from database import students_db, teachers_db, courses_db, undo_stack, get_next_student_id, find_student_by_id
 from models import Student, Teacher, Course

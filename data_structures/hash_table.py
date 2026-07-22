@@ -4,13 +4,7 @@
 class HashTable:
 
     def __init__(self, initial_capacity=16, load_factor=0.75):
-        """
-        Initialize the hash table.
 
-        Args:
-            initial_capacity: Number of buckets (must be power of 2 for good hashing)
-            load_factor: Threshold to trigger resize (default 0.75)
-        """
         self._capacity = initial_capacity
         self._load_factor = load_factor
         self._buckets = [[] for _ in range(self._capacity)]  # Chaining

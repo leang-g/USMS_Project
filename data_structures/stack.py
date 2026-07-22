@@ -1,17 +1,6 @@
 """Stack implementation for undo functionality."""
 
 class Stack:
-    """
-    A simple stack implementation using Python list.
-
-    Operations:
-        push(item)   -> Add item to top (O(1))
-        pop()        -> Remove and return top item (O(1))
-        peek()       -> View top item without removing (O(1))
-        is_empty()   -> Check if stack is empty (O(1))
-        size()       -> Get number of items (O(1))
-        clear()      -> Remove all items (O(n))
-    """
 
     def __init__(self):
         """Initialize an empty stack."""
